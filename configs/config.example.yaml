@@ -1,0 +1,47 @@
+server:
+  name: llama-gateway
+  host: 0.0.0.0
+  port: 4000
+  request_timeout_seconds: 300
+
+auth:
+  enabled: true
+  api_keys:
+    - local-key
+
+backends:
+  - name: llama-fast
+    url: http://localhost:8081
+    model: llama-fast
+    tags:
+      - chat
+      - fast
+    priority: 10
+
+  - name: qwen-tools
+    url: http://localhost:8082
+    model: qwen-tools
+    tags:
+      - chat
+      - tools
+    priority: 20
+
+  - name: embeddings
+    url: http://localhost:8083
+    model: embeddings
+    tags:
+      - embeddings
+    priority: 30
+
+routing:
+  default_backend: llama-fast
+  rules:
+    - name: embeddings
+      endpoint: /v1/embeddings
+      backend: embeddings
+    - name: tools
+      requires_tools: true
+      backend: qwen-tools
+
+logging:
+  enabled: true
