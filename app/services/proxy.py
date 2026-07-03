@@ -17,8 +17,15 @@ class ProxyService:
         started = perf_counter()
         url = f"{backend.url.rstrip('/')}{endpoint}"
         headers = self._headers(request)
+
         body = dict(body)
         body["model"] = backend.model
+        if backend.prompt:
+            body["messages"] = [
+                {"role": "system", "content": backend.prompt},
+                {"role": "user", "content": body.get("prompt", "")}
+            ]
+
         stream = bool(body.get("stream"))
 
         try:
@@ -26,13 +33,16 @@ class ProxyService:
                 response = await self._stream(url, headers, body)
             else:
                 response = await self._json(url, headers, body)
-            REQUESTS.labels(endpoint=endpoint, backend=backend.name, status=str(response.status_code)).inc()
+            REQUESTS.labels(endpoint=endpoint, backend=backend.name,
+                            status=str(response.status_code)).inc()
             return response
         except httpx.HTTPError:
-            REQUESTS.labels(endpoint=endpoint, backend=backend.name, status="502").inc()
+            REQUESTS.labels(endpoint=endpoint,
+                            backend=backend.name, status="502").inc()
             raise backend_unavailable(backend.name)
         finally:
-            LATENCY.labels(endpoint=endpoint, backend=backend.name).observe(perf_counter() - started)
+            LATENCY.labels(endpoint=endpoint, backend=backend.name).observe(
+                perf_counter() - started)
 
     async def health(self, backend: BackendConfig) -> dict:
         url = f"{backend.url.rstrip()}/health"
@@ -65,7 +75,8 @@ class ProxyService:
         return StreamingResponse(
             iterator(),
             status_code=response.status_code,
-            media_type=response.headers.get("content-type", "text/event-stream"),
+            media_type=response.headers.get(
+                "content-type", "text/event-stream"),
         )
 
     def _headers(self, request: Request) -> dict:

@@ -29,9 +29,11 @@ class RouterService:
             "object": "list",
             "data": [
                 {
+                    "object": "backend",
                     "name": backend.name,
                     "model": backend.model,
-                    "object": "backend",
+                    "prompt": backend.prompt,
+                    "tags": backend.tags,
                     "owned_by": "llama.cpp",
                     "healthy": (await self.proxy_service.health(backend))["healthy"],
                 }
