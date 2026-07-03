@@ -133,7 +133,7 @@ cp configs/config.example.yaml configs/config.yaml
 Run LlamaFleet:
 
 ```bash
-LLAMAFLEET_CONFIG=configs/config.yaml uvicorn app.main:app --host 0.0.0.0 --port 4000
+LLAMA_GATEWAY_CONFIG=configs/config.yaml uvicorn app.main:app --host 0.0.0.0 --port 4000
 ```
 
 Test the health endpoint:
