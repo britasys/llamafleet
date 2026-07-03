@@ -58,11 +58,11 @@ Please keep pull requests focused and easy to review.
 
 When contributing:
 
-* Keep changes small and focused.
-* Prefer simple, readable code.
-* Follow the existing project structure and coding style.
-* Add or update tests when appropriate.
-* Update documentation if your change affects users.
+- Keep changes small and focused.
+- Prefer simple, readable code.
+- Follow the existing project structure and coding style.
+- Add or update tests when appropriate.
+- Update documentation if your change affects users.
 
 ## Running Checks
 
@@ -80,20 +80,20 @@ Please ensure all checks pass.
 
 When opening a pull request:
 
-* Clearly describe what changed and why.
-* Reference related issues when applicable.
-* Keep pull requests focused on a single topic.
+- Clearly describe what changed and why.
+- Reference related issues when applicable.
+- Keep pull requests focused on a single topic.
 
 ## Project Philosophy
 
 LlamaFleet aims to remain:
 
-* Lightweight
-* Easy to understand
-* OpenAI-compatible
-* Simple to configure
-* Production-friendly
-* Easy to extend
+- Lightweight
+- Easy to understand
+- OpenAI-compatible
+- Simple to configure
+- Production-friendly
+- Easy to extend
 
 When adding new features, prefer simple solutions over complex abstractions. Advanced functionality should remain optional whenever possible.
 
@@ -101,13 +101,13 @@ When adding new features, prefer simple solutions over complex abstractions. Adv
 
 Some ideas for new contributors include:
 
-* Improving documentation
-* Adding unit tests
-* Improving error messages
-* Expanding API examples
-* Improving health checks
-* Adding new OpenAI-compatible endpoints
-* Improving logging and metrics
+- Improving documentation
+- Adding unit tests
+- Improving error messages
+- Expanding API examples
+- Improving health checks
+- Adding new OpenAI-compatible endpoints
+- Improving logging and metrics
 
 ## Questions
 
