@@ -1,5 +1,3 @@
-Here is a complete `README.md` you can put in the repo:
-
 # LlamaFleet
 
 Open-source gateway middleware for `llama.cpp` servers.
