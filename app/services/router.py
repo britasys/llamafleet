@@ -1,10 +1,12 @@
 from app.core.config import AppConfig, BackendConfig
 from app.core.errors import backend_not_found
+from app.services.proxy import ProxyService
 
 
 class RouterService:
-    def __init__(self, config: AppConfig):
+    def __init__(self, config: AppConfig, proxy_service: ProxyService):
         self.config = config
+        self.proxy_service = proxy_service
         self.backends = {backend.name: backend for backend in config.backends}
 
     def get_backend(self, endpoint: str, body: dict) -> BackendConfig:
@@ -22,14 +24,16 @@ class RouterService:
 
         return self._backend(self.config.routing.default_backend)
 
-    def list_models(self) -> dict:
+    async def list_backends(self) -> dict:
         return {
             "object": "list",
             "data": [
                 {
-                    "id": backend.model,
-                    "object": "model",
+                    "name": backend.name,
+                    "model": backend.model,
+                    "object": "backend",
                     "owned_by": "llama.cpp",
+                    "healthy": (await self.proxy_service.health(backend))["healthy"],
                 }
                 for backend in sorted(self.config.backends, key=lambda item: item.priority)
             ],

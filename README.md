@@ -26,40 +26,40 @@ Instead of connecting each app directly to a specific `llama.cpp` server, your a
 
 ## Features
 
-* OpenAI-compatible `/v1/chat/completions` proxy
-* OpenAI-compatible `/v1/completions` proxy
-* OpenAI-compatible `/v1/embeddings` proxy
-* OpenAI-compatible `/v1/models` endpoint
-* Multiple backend support
-* Model-based routing
-* Default backend routing
-* Bearer token API-key authentication
-* Streaming response proxying
-* Backend health checks
-* Simple YAML configuration
-* FastAPI-based API server
-* Clean structure for future extensions
+- OpenAI-compatible `/v1/chat/completions` proxy
+- OpenAI-compatible `/v1/completions` proxy
+- OpenAI-compatible `/v1/embeddings` proxy
+- OpenAI-compatible `/v1/models` endpoint
+- Multiple backend support
+- Model-based routing
+- Default backend routing
+- Bearer token API-key authentication
+- Streaming response proxying
+- Backend health checks
+- Simple YAML configuration
+- FastAPI-based API server
+- Clean structure for future extensions
 
 ## Roadmap
 
 Planned features:
 
-* Backend fallback routing
-* Per-backend load balancing
-* Request and response logging
-* SQLite usage database
-* Prometheus metrics
-* Token usage tracking
-* Latency tracking
-* Prompt and embedding cache
-* RAG injection layer
-* Tool execution layer
-* Per-user API keys
-* Rate limiting
-* Web dashboard
-* GGUF model registry
-* Docker Compose examples
-* Kubernetes deployment examples
+- Backend fallback routing
+- Per-backend load balancing
+- Request and response logging
+- SQLite usage database
+- Prometheus metrics
+- Token usage tracking
+- Latency tracking
+- Prompt and embedding cache
+- RAG injection layer
+- Tool execution layer
+- Per-user API keys
+- Rate limiting
+- Web dashboard
+- GGUF model registry
+- Docker Compose examples
+- Kubernetes deployment examples
 
 ## Project Status
 
@@ -71,9 +71,9 @@ The first goal is simple:
 
 ## Requirements
 
-* Python 3.11+
-* One or more running `llama-server` instances
-* A GGUF model loaded by each `llama.cpp` backend
+- Python 3.11+
+- One or more running `llama-server` instances
+- A GGUF model loaded by each `llama.cpp` backend
 
 ## Installation
 
@@ -249,43 +249,16 @@ Response:
 }
 ```
 
-## Backend Status
+## List Backends
 
 ```http
-GET /backends
+GET /v1/backends
 ```
 
 Example:
 
 ```bash
-curl http://localhost:4000/backends
-```
-
-Response:
-
-```json
-{
-  "llama-small": {
-    "url": "http://127.0.0.1:8081",
-    "status": "healthy"
-  },
-  "qwen-coder": {
-    "url": "http://127.0.0.1:8082",
-    "status": "offline"
-  }
-}
-```
-
-## List Models
-
-```http
-GET /v1/models
-```
-
-Example:
-
-```bash
-curl http://localhost:4000/v1/models \
+curl http://localhost:4000/v1/backends \
   -H "Authorization: Bearer local-key"
 ```
 
@@ -296,19 +269,25 @@ Response:
   "object": "list",
   "data": [
     {
-      "id": "auto",
-      "object": "model",
-      "owned_by": "llamafleet"
+      "name": "llama-fast",
+      "model": "llama-fast",
+      "object": "backend",
+      "owned_by": "llama.cpp",
+      "healthy": true
     },
     {
-      "id": "llama-small",
-      "object": "model",
-      "owned_by": "llamafleet"
+      "name": "qwen-tools",
+      "model": "qwen-tools",
+      "object": "backend",
+      "owned_by": "llama.cpp",
+      "healthy": true
     },
     {
-      "id": "qwen-coder",
-      "object": "model",
-      "owned_by": "llamafleet"
+      "name": "embeddings",
+      "model": "embeddings",
+      "object": "backend",
+      "owned_by": "llama.cpp",
+      "healthy": true
     }
   ]
 }
@@ -438,7 +417,7 @@ import OpenAI from "openai";
 
 const client = new OpenAI({
   baseURL: "http://localhost:4000/v1",
-  apiKey: "local-key"
+  apiKey: "local-key",
 });
 
 const response = await client.chat.completions.create({
@@ -446,9 +425,9 @@ const response = await client.chat.completions.create({
   messages: [
     {
       role: "user",
-      content: "Explain GGUF models in simple terms."
-    }
-  ]
+      content: "Explain GGUF models in simple terms.",
+    },
+  ],
 });
 
 console.log(response.choices[0].message.content);
@@ -638,16 +617,16 @@ LlamaFleet is intentionally minimal in the first version.
 
 Current limitations:
 
-* No fallback routing yet
-* No load balancing yet
-* No request logging database yet
-* No metrics endpoint yet
-* No dashboard yet
-* No RAG injection yet
-* No tool execution layer yet
-* No per-user permissions yet
-* No rate limits yet
-* No model lifecycle management yet
+- No fallback routing yet
+- No load balancing yet
+- No request logging database yet
+- No metrics endpoint yet
+- No dashboard yet
+- No RAG injection yet
+- No tool execution layer yet
+- No per-user permissions yet
+- No rate limits yet
+- No model lifecycle management yet
 
 These features are planned for future releases.
 
@@ -657,13 +636,13 @@ Do not expose LlamaFleet directly to the public internet without proper security
 
 For production use, place it behind:
 
-* HTTPS
-* Reverse proxy
-* Strong API keys
-* Firewall rules
-* Rate limiting
-* Access logs
-* Monitoring
+- HTTPS
+- Reverse proxy
+- Strong API keys
+- Firewall rules
+- Rate limiting
+- Access logs
+- Monitoring
 
 Example production stack:
 
@@ -702,44 +681,44 @@ redis
 
 LlamaFleet is useful for:
 
-* Local AI applications
-* Private AI deployments
-* Internal company assistants
-* Developer tools
-* Local coding assistants
-* RAG applications
-* Multi-model experiments
-* Edge AI systems
-* Offline AI environments
-* Teams using multiple GGUF models
-* OpenAI-compatible apps that need local backends
+- Local AI applications
+- Private AI deployments
+- Internal company assistants
+- Developer tools
+- Local coding assistants
+- RAG applications
+- Multi-model experiments
+- Edge AI systems
+- Offline AI environments
+- Teams using multiple GGUF models
+- OpenAI-compatible apps that need local backends
 
 ## Design Goals
 
 LlamaFleet should be:
 
-* Simple to run
-* Easy to configure
-* OpenAI-compatible
-* Local-first
-* Model-agnostic within `llama.cpp`
-* Lightweight
-* Production-friendly
-* Extensible
-* Easy to self-host
-* Useful without requiring a full agent framework
+- Simple to run
+- Easy to configure
+- OpenAI-compatible
+- Local-first
+- Model-agnostic within `llama.cpp`
+- Lightweight
+- Production-friendly
+- Extensible
+- Easy to self-host
+- Useful without requiring a full agent framework
 
 ## Non-Goals
 
 LlamaFleet is not trying to be:
 
-* A replacement for `llama.cpp`
-* A replacement for `llama-server`
-* A full agent framework
-* A prompt-template framework
-* A vector database
-* A hosted SaaS platform
-* A model training system
+- A replacement for `llama.cpp`
+- A replacement for `llama-server`
+- A full agent framework
+- A prompt-template framework
+- A vector database
+- A hosted SaaS platform
+- A model training system
 
 ## Comparison with App Frameworks
 
@@ -782,27 +761,27 @@ Contributions are welcome.
 
 Good first issues:
 
-* Add tests for routing
-* Add tests for config loading
-* Add fallback backend support
-* Add request latency logging
-* Add Docker Compose example
-* Add Prometheus metrics
-* Improve streaming support
-* Add `/v1/responses` proxy support
-* Add better error handling
-* Add documentation examples
+- Add tests for routing
+- Add tests for config loading
+- Add fallback backend support
+- Add request latency logging
+- Add Docker Compose example
+- Add Prometheus metrics
+- Improve streaming support
+- Add `/v1/responses` proxy support
+- Add better error handling
+- Add documentation examples
 
 ## Development Principles
 
-* Keep the core small
-* Avoid unnecessary abstractions
-* Prefer configuration over code
-* Do not hide `llama.cpp`
-* Keep OpenAI compatibility simple
-* Make local deployment easy
-* Add production features gradually
-* Keep advanced features optional
+- Keep the core small
+- Avoid unnecessary abstractions
+- Prefer configuration over code
+- Do not hide `llama.cpp`
+- Keep OpenAI compatibility simple
+- Make local deployment easy
+- Add production features gradually
+- Keep advanced features optional
 
 ## License
 

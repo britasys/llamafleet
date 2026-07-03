@@ -8,8 +8,8 @@ from app.services.router import RouterService
 router = APIRouter()
 config = get_config()
 auth_service = AuthService(config)
-router_service = RouterService(config)
 proxy_service = ProxyService(config.server.request_timeout_seconds)
+router_service = RouterService(config, proxy_service)
 
 
 async def handle(request: Request, endpoint: str):
@@ -19,10 +19,10 @@ async def handle(request: Request, endpoint: str):
     return await proxy_service.forward(request, backend, endpoint, body)
 
 
-@router.get("/v1/models")
-async def models(request: Request):
+@router.get("/v1/backends")
+async def backends(request: Request):
     auth_service.verify(request)
-    return router_service.list_models()
+    return await router_service.list_backends()
 
 
 @router.post("/v1/chat/completions")
