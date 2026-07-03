@@ -1,0 +1,58 @@
+services:
+  gateway:
+    container_name: llama-gateway
+    build: 
+      context: .
+      dockerfile: Dockerfile.example
+    ports:
+      - "4000:4000"
+    environment:
+      LLAMA_GATEWAY_CONFIG: /app/configs/config.example.yaml
+    networks:
+      - llama-gateway-network
+
+  llama-fast:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: llama-fast
+    volumes:
+      - ./models:/models
+    ports:
+      - "8081:8081"
+    command: >
+      -m /models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --port 8081
+      --host 0.0.0.0
+      -n 512
+    networks:
+      - llama-gateway-network
+  qwen-tools:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: qwen-tools
+    volumes:
+      - ./models:/models
+    ports:
+      - "8082:8082"
+    command: >
+      -m /models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --port 8082
+      --host 0.0.0.0
+      -n 512
+    networks:
+      - llama-gateway-network
+  embeddings:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: embeddings
+    volumes:
+      - ./models:/models
+    ports:
+      - "8083:8083"
+    command: >
+      -m /models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --port 8083
+      --host 0.0.0.0
+      -n 512
+    networks:
+      - llama-gateway-network
+networks:
+  llama-gateway-network:
+    driver: bridge

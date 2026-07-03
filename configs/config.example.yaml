@@ -5,13 +5,13 @@ server:
   request_timeout_seconds: 300
 
 auth:
-  enabled: true
+  enabled: false
   api_keys:
     - local-key
 
 backends:
   - name: llama-fast
-    url: http://localhost:8081
+    url: http://llama-fast:8081
     model: llama-fast
     tags:
       - chat
@@ -19,7 +19,7 @@ backends:
     priority: 10
 
   - name: qwen-tools
-    url: http://localhost:8082
+    url: http://qwen-tools:8082
     model: qwen-tools
     tags:
       - chat
@@ -27,7 +27,7 @@ backends:
     priority: 20
 
   - name: embeddings
-    url: http://localhost:8083
+    url: http://embeddings:8083
     model: embeddings
     tags:
       - embeddings

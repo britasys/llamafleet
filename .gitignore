@@ -64,6 +64,8 @@ dist-ssr/
 docker-compose.override.yml
 
 models/
+models
+
 *.gguf
 *.bin
 *.safetensors

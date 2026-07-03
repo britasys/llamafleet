@@ -1,7 +1,0 @@
-services:
-  gateway:
-    build: .
-    ports:
-      - "4000:4000"
-    environment:
-      LLAMA_GATEWAY_CONFIG: /app/configs/config.example.yaml
