@@ -1,6 +1,7 @@
 import pytest
 
 from app.services.load_balancer import LoadBalancer, NoHealthyBackendError
+from app.services.transport_pool import TransportPool
 
 
 class FakeTransport:
@@ -10,7 +11,7 @@ class FakeTransport:
         self.is_open = is_open
 
 
-class FakePool:
+class FakePool(TransportPool):
     def __init__(self, transports):
         self._transports = transports
 
