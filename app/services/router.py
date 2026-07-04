@@ -1,15 +1,13 @@
 from app.core.config import AppConfig, BackendConfig
 from app.core.errors import backend_not_found
-from app.services.proxy import ProxyService
 
 
 class RouterService:
-    def __init__(self, config: AppConfig, proxy_service: ProxyService):
+    def __init__(self, config: AppConfig):
         self.config = config
-        self.proxy_service = proxy_service
         self.backends = {backend.name: backend for backend in config.backends}
 
-    def get_backend(self, endpoint: str, body: dict) -> BackendConfig:
+    def _match_rule(self, endpoint: str, body: dict) -> BackendConfig:
         model = body.get("model")
         requires_tools = bool(body.get("tools"))
 
@@ -24,7 +22,19 @@ class RouterService:
 
         return self._backend(self.config.routing.default_backend)
 
-    async def list_backends(self) -> dict:
+    def get_backend(self, endpoint: str, body: dict) -> BackendConfig:
+        return self._match_rule(endpoint, body)
+
+    def get_backends(self, endpoint: str, body: dict) -> list[BackendConfig]:
+        primary = self._match_rule(endpoint, body)
+        candidates = [
+            backend
+            for backend in self.config.backends
+            if backend.model == primary.model
+        ]
+        return candidates or [primary]
+
+    def list_backends(self) -> dict:
         return {
             "object": "list",
             "data": [
@@ -35,7 +45,6 @@ class RouterService:
                     "prompt": backend.prompt,
                     "tags": backend.tags,
                     "owned_by": "llama.cpp",
-                    "healthy": (await self.proxy_service.health(backend))["healthy"],
                 }
                 for backend in sorted(self.config.backends, key=lambda item: item.priority)
             ],

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -12,6 +12,11 @@ class ServerConfig(BaseModel):
     host: str = "0.0.0.0"
     port: int = 4000
     request_timeout_seconds: float = 300
+    max_concurrent_requests: int = 64
+    max_queue_size: int = 500
+    queue_timeout_seconds: float = 30
+    rate_limit_capacity: float = 60
+    rate_limit_refill_per_second: float = 1.0
 
 
 class AuthConfig(BaseModel):
@@ -67,16 +72,57 @@ class AppConfig(BaseModel):
     routing: RoutingConfig
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
 
+    @model_validator(mode="after")
+    def _validate_references(self) -> "AppConfig":
+        if not self.backends:
+            raise ValueError("config must define at least one backend")
+
+        backend_names = [backend.name for backend in self.backends]
+        duplicates = {
+            name for name in backend_names if backend_names.count(name) > 1}
+        if duplicates:
+            raise ValueError(
+                f"duplicate backend names in config: {sorted(duplicates)}")
+
+        name_set = set(backend_names)
+        rag_names = {rag.name for rag in self.rags}
+
+        if self.routing.default_backend not in name_set:
+            raise ValueError(
+                f"routing.default_backend '{self.routing.default_backend}' "
+                f"is not a defined backend: {sorted(name_set)}"
+            )
+
+        for rule in self.routing.rules:
+            if rule.backend not in name_set:
+                raise ValueError(
+                    f"routing rule '{rule.name}' points to unknown backend '{rule.backend}'"
+                )
+
+        for backend in self.backends:
+            if backend.rag_name is not None and backend.rag_name not in rag_names:
+                raise ValueError(
+                    f"backend '{backend.name}' references unknown rag '{backend.rag_name}'"
+                )
+            if backend.prompt_name is not None and backend.prompt_name not in self.prompts:
+                raise ValueError(
+                    f"backend '{backend.name}' references unknown prompt '{backend.prompt_name}'"
+                )
+
+        return self
+
 
 class Settings(BaseSettings):
     llama_gateway_config: str = "config.example.yaml"
 
 
 def resolve_prompt(prompts: dict[str, str], backend: BackendConfig) -> str:
-    return prompts.get(
-        backend.prompt or "default_prompt",
-        prompts["default_prompt"]
-    )
+    prompt_name = backend.prompt_name or "default_prompt"
+    if prompt_name not in prompts:
+        raise ValueError(
+            f"backend '{backend.name}' references unknown prompt '{prompt_name}'")
+    return prompts[prompt_name]
+
 
 def resolve_rag(rags: list[RAGConfig], backend: BackendConfig) -> RAGConfig | None:
     if backend.rag_name is None:
@@ -84,7 +130,9 @@ def resolve_rag(rags: list[RAGConfig], backend: BackendConfig) -> RAGConfig | No
     for rag in rags:
         if rag.name == backend.rag_name:
             return rag
-    return None
+    raise ValueError(
+        f"backend '{backend.name}' references unknown rag '{backend.rag_name}'")
+
 
 def load_yaml(path: str | Path) -> AppConfig:
     with open(path, "r", encoding="utf-8") as file:
@@ -102,4 +150,4 @@ def load_yaml(path: str | Path) -> AppConfig:
 @lru_cache
 def get_config() -> AppConfig:
     settings = Settings()
-    return AppConfig.model_validate(load_yaml(settings.llama_gateway_config))
+    return load_yaml(settings.llama_gateway_config)

@@ -3,6 +3,11 @@ server:
   host: 0.0.0.0
   port: 4000
   request_timeout_seconds: 300
+  max_concurrent_requests: 64
+  max_queue_size: 500
+  queue_timeout_seconds: 30
+  rate_limit_capacity: 60
+  rate_limit_refill_per_second: 1.0
 
 auth:
   enabled: false
@@ -47,34 +52,34 @@ rags:
     min_score: 0.7
 
 backends:
-  # - name: llama-fast
-  #   # url: http://llama-fast:8081
-  #   url: http://localhost:8081
-  #   model: llama-fast
-  #   prompt_name: default_prompt
-  #   tags:
-  #     - chat
-  #     - fast
-  #   priority: 10
+  - name: llama-fast
+    # url: http://llama-fast:8081
+    url: http://localhost:8081
+    model: llama-fast
+    prompt_name: default_prompt
+    tags:
+      - chat
+      - fast
+    priority: 10
 
-  # - name: qwen-tools
-  #   # url: http://qwen-tools:8082
-  #   url: http://localhost:8082
-  #   model: qwen-tools
-  #   prompt_name: prompt_with_tools
-  #   tags:
-  #     - chat
-  #     - tools
-  #   priority: 20
+  - name: qwen-tools
+    # url: http://qwen-tools:8082
+    url: http://localhost:8082
+    model: qwen-tools
+    prompt_name: prompt_with_tools
+    tags:
+      - chat
+      - tools
+    priority: 20
 
-  # - name: embeddings
-  #   # url: http://embeddings:8083
-  #   url: http://localhost:8083
-  #   model: embeddings
-  #   prompt_name: prompt_with_embeddings
-  #   tags:
-  #     - embeddings
-  #   priority: 30
+  - name: embeddings
+    # url: http://embeddings:8083
+    url: http://localhost:8083
+    model: embeddings
+    prompt_name: prompt_with_embeddings
+    tags:
+      - embeddings
+    priority: 30
 
   - name: backend-with-rag
     # url: http://embeddings:8083
