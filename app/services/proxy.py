@@ -45,7 +45,7 @@ class ProxyService:
                 perf_counter() - started)
 
     async def health(self, backend: BackendConfig) -> dict:
-        url = f"{backend.url.rstrip()}/health"
+        url = f"{backend.url.rstrip('/')}/health"
         try:
             async with httpx.AsyncClient(timeout=5) as client:
                 response = await client.get(url)
