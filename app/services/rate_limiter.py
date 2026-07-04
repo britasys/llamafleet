@@ -45,4 +45,8 @@ class RateLimiter:
         bucket = self._bucket(key)
         self._refill(bucket)
         deficit = cost - bucket.tokens
-        return max(0.0, deficit / bucket.refill_rate)
+        if deficit <= 0:
+            return 0.0
+        if bucket.refill_rate <= 0:
+            return float("inf")
+        return deficit / bucket.refill_rate

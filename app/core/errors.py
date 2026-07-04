@@ -32,7 +32,7 @@ def too_many_requests(retry_after: float) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
         detail="Rate limit exceeded",
-        headers={"Retry-After": str(int(retry_after) + 1)},
+        headers={"Retry-After": str(retry_after + 1)},
     )
 
 
