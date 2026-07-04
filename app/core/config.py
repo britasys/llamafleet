@@ -34,6 +34,7 @@ class BackendConfig(BaseModel):
     model: str
     rag_name: str | None = None
     rag: RAGConfig | None = None
+    prompt_name: str | None = None
     prompt: str | None = None
     messages: list[str] | None = None
     tags: list[str] = Field(default_factory=list)
@@ -60,7 +61,7 @@ class LoggingConfig(BaseModel):
 class AppConfig(BaseModel):
     server: ServerConfig = Field(default_factory=ServerConfig)
     auth: AuthConfig = Field(default_factory=AuthConfig)
-    prompts: dict[str, list[str]] = Field(default_factory=dict)
+    prompts: dict[str, str] = Field(default_factory=dict)
     rags: list[RAGConfig] = Field(default_factory=list)
     backends: list[BackendConfig]
     routing: RoutingConfig
@@ -71,7 +72,7 @@ class Settings(BaseSettings):
     llama_gateway_config: str = "config.example.yaml"
 
 
-def resolve_prompt(prompts: dict[str, list[str]], backend: BackendConfig) -> list[str]:
+def resolve_prompt(prompts: dict[str, str], backend: BackendConfig) -> str:
     return prompts.get(
         backend.prompt or "default_prompt",
         prompts["default_prompt"]
@@ -92,7 +93,7 @@ def load_yaml(path: str | Path) -> AppConfig:
     config = AppConfig.model_validate(data)
 
     for backend in config.backends:
-        backend.messages = resolve_prompt(config.prompts, backend)
+        backend.prompt = resolve_prompt(config.prompts, backend)
         backend.rag = resolve_rag(config.rags, backend)
 
     return config

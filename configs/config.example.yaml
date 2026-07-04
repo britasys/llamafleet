@@ -10,33 +10,33 @@ auth:
     - local-key
 
 prompts:
-  default_prompt:
-    - You are a helpful assistant.
-    - Answer the question as truthfully as possible.
-    - If you don't know the answer, say "I don't know".
+  default_prompt: |
+    You are a helpful assistant.
+    Answer the question as truthfully as possible.
+    If you don't know the answer, say "I don't know".
 
-  prompt_with_tools: 
-    - You are a helpful assistant with access to tools.
-    - Answer the question as truthfully as possible.
-    - If you don't know the answer, say "I don't know".
-    - Use the tools when appropriate.
+  prompt_with_tools: |
+    You are a helpful assistant with access to tools.
+    Answer the question as truthfully as possible.
+    If you don't know the answer, say "I don't know".
+    Use the tools when appropriate.
 
-  prompt_with_embeddings: 
-    - You are a helpful assistant with access to embeddings.
-    - Answer the question as truthfully as possible.
-    - If you don't know the answer, say "I don't know".
-    - Use the embeddings when appropriate.
+  prompt_with_embeddings: |
+    You are a helpful assistant with access to embeddings.
+    Answer the question as truthfully as possible.
+    If you don't know the answer, say "I don't know".
+    Use the embeddings when appropriate.
 
-  # rag_prompt: |
-  #     Use the following context to answer the user's question.
+  rag_prompt: |
+      Use the following context to answer the user's question.
 
-  #     Context:
-  #     {{context}}
+      Context:
+      {{context}}
 
-  #     Question:
-  #     {{question}}
+      Question:
+      {{question}}
 
-  #     If the answer is not contained in the context, say you don't know.
+      If the answer is not contained in the context, say you don't know.
 
 rags:
   - name: rag_01
@@ -51,7 +51,7 @@ backends:
   #   # url: http://llama-fast:8081
   #   url: http://localhost:8081
   #   model: llama-fast
-  #   prompt: default_prompt
+  #   prompt_name: default_prompt
   #   tags:
   #     - chat
   #     - fast
@@ -61,7 +61,7 @@ backends:
   #   # url: http://qwen-tools:8082
   #   url: http://localhost:8082
   #   model: qwen-tools
-  #   prompt: prompt_with_tools
+  #   prompt_name: prompt_with_tools
   #   tags:
   #     - chat
   #     - tools
@@ -71,7 +71,7 @@ backends:
   #   # url: http://embeddings:8083
   #   url: http://localhost:8083
   #   model: embeddings
-  #   prompt: prompt_with_embeddings
+  #   prompt_name: prompt_with_embeddings
   #   tags:
   #     - embeddings
   #   priority: 30
@@ -81,7 +81,7 @@ backends:
     url: http://localhost:8084
     model: llama-fast
     rag_name: rag_01
-    prompt: rag_prompt
+    prompt_name: rag_prompt
     tags:
       - rag
     priority: 40

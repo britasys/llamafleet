@@ -53,6 +53,22 @@ services:
       -n 512
     networks:
       - llama-gateway-network
+
+  backend-with-rag:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: backend-with-rag
+    volumes:
+      - ./models:/models
+    ports:
+      - "8084:8084"
+    command: >
+      -m /models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+      --port 8084
+      --host 0.0.0.0
+      -n 512
+    networks:
+      - llama-gateway-network
+
 networks:
   llama-gateway-network:
     driver: bridge
